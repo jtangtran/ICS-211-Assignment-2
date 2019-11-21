@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Assignment 2 Kanye West</title>
+    <script crossorigin src="https://unpkg.com/react@16/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"></script>
+    <script crossorigin src="https://unpkg.com/babel-standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/styled-components/dist/styled-components.min.js"></script>
+  </head>
+  <body>
+    <div id="container"></div>
+    <script type="text/babel">
+    //stateful function
+        const AppHookStateful = (props) => {
+            //state variable
+            const [quotes, setQuotes] = React.useState([]);
+            React.useEffect( () => {
+                //fetches the kanye west api 3 times to get the quote and add it in the quotes array 
+                //also adding an id to be able to do the map
+                for (let i = 0; i < 5; i++){
+                    (async () => {
+                        try {
+                                const response = await fetch('https://api.kanye.rest');
+                                if (!response.ok)
+                                throw Error(response.status + ': ' + response.statusText);
+                                const result = await response.json();
+                                //adding an id
+                                result.id = i;
+                                //basically adding on to the array, instead of overwriting it
+                                setQuotes(quotes=> [...quotes, result] );
+                        } catch (error) {
+                            console.log('Fetch API Error: ' + error);
+                        }
+                    })(); // closes async fetch call as iffy
+                } //closes the for loop
+            },[]); // closes async func passed into UseEffect
+            return (
+                <div className={props.className}>
+                    <StyledTitle />
+                    <ol>
+                        {quotes.map(quote => 
+                        //the quotes is our array
+                        //using the map function to display each quote
+                        //in order to map it we need the key so we put it in the id
+                        //quote.quote the first quote is from the mapping function
+                        //the second one is the quote in our array
+                            <StyledQuote key={quote.id} name={quote.quote}  /> 
+                        )}
+                    </ol>
+                </div>
+            );
+        } //closes the function
+
+        //Title Component
+        const Title = ({className}) => (
+                    <div className={className}>
+                        <h1>Kanye West, our Saviour</h1>
+                        <h3>Jennifer Tang-Tran</h3>
+                    </div>    
+            ); //closes the title component
+        
+        //style component for the title
+        const StyledTitle = styled(Title)`    
+            color: black;
+            text-align: center;
+            font-weight: bold;
+            font-size: 25px;
+            background-color: lightpink;
+        `;
+
+        //view only component
+        const Quote = ({className, name}) => (
+                <li className={className}>
+                    {name} 
+                </li>
+            );
+
+        const StyledQuote = styled(Quote)`    
+                padding: 10px;
+                font-weight: bold;
+            `;
+
+        const StyledApp = styled(AppHookStateful)`    
+            background-color: white;    
+            box-shadow: 0px 0px 5px gray;    
+            padding: 10px; 
+            text-indent: 3px;
+        `;
+
+        //putting it all together
+        ReactDOM.render(
+            <StyledApp />,
+            document.getElementById('container')
+        );
+
+        </script>
+    </body>
+</html>
